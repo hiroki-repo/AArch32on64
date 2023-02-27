@@ -153,7 +153,7 @@ condition0:
         *(UINT32*)(JITTMP + 8) = 0xF2A00012;
         *(UINT32*)(JITTMP + 12) = 0x0B1201EF;
         Opctmp3 = (((Opctmp >> 12) & 0xF) << 0) | (((Opctmp >> 16) & 0xF) << 5) | (((Opctmp >> 25) & 0x1) << 24) | (((Opctmp >> 25) & 0x1) ? ((Opctmp&0xFFF)<<10) : ((Opctmp&0xF)<<16)) | (((Opctmp >> 20) & 1) << 29);
-        Opctmp3_rsb = (((Opctmp >> 12) & 0xF) << 0) | (((Opctmp >> 16) & 0xF) << 5) | 0 | ((18) << 16) | (((Opctmp >> 20) & 1) << 29);
+        Opctmp3_rsb = (((Opctmp >> 12) & 0xF) << 0) | ((18) << 5) | 0 | (((Opctmp >> 16) & 0xF) << 16) | (((Opctmp >> 20) & 1) << 29);
         Condtmp = 0x0e;
         if (Addr & 1) {
             Opctmp = *(UINT16*)(Addrtmp);
@@ -174,7 +174,7 @@ condition0:
                 Opctmp2 = 0x4b000000 | Opctmp3;
                 break;
             case 3:
-                Opctmp4 = 0;
+                Opctmp4 = (Opctmp & 0xFFF);
                 if (((Opctmp >> 25) & 0x1) == 0) {
                     *(UINT32*)(JITTMP + 4) = 0xD2800012 | ((Opctmp4 >> (16 * 0)) & 0xFFFF) << 5;
                     *(UINT32*)(JITTMP + 8) = 0xF2A00012 | ((Opctmp4 >> (16 * 1)) & 0xFFFF) << 5;
@@ -197,7 +197,7 @@ condition0:
                 Opctmp2 = 0x5a000000 | Opctmp3;
                 break;
             case 7:
-                Opctmp4 = 0;
+                Opctmp4 = (Opctmp & 0xFFF);
                 if (((Opctmp >> 25) & 0x1) == 0) {
                     *(UINT32*)(JITTMP + 4) = 0xD2800012 | ((Opctmp4 >> (16 * 0)) & 0xFFFF) << 5;
                     *(UINT32*)(JITTMP + 8) = 0xF2A00012 | ((Opctmp4 >> (16 * 1)) & 0xFFFF) << 5;
