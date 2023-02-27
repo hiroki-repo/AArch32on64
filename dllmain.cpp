@@ -127,6 +127,7 @@ void* transcode32to64(UINT32 Addr) {
     UINT32 Opctmp2;
     UINT32 Opctmp3;
     UINT32 Opctmp3_rsb;
+    UINT32 Opctmp4;
     /*
 add x15,x15,4
 movz x18,0x0000
@@ -146,8 +147,13 @@ condition0:
     char* ARMCode32on64 = (char*)malloc(4096 * sizeof(JITTMP));
 
     for (int cnt = 0; cnt < 4096; cnt++) {
+        *(UINT32*)(JITTMP + 32) = 0xD503201F;
+        *(UINT32*)(JITTMP + 36) = 0xD503201F;
+        *(UINT32*)(JITTMP + 4) = 0xD2800012;
+        *(UINT32*)(JITTMP + 8) = 0xF2A00012;
+        *(UINT32*)(JITTMP + 12) = 0x0B1201EF;
         Opctmp3 = (((Opctmp >> 12) & 0xF) << 0) | (((Opctmp >> 16) & 0xF) << 5) | (((Opctmp >> 25) & 0x1) << 24) | (((Opctmp >> 25) & 0x1) ? ((Opctmp&0xFFF)<<10) : ((Opctmp&0xF)<<16)) | (((Opctmp >> 20) & 1) << 29);
-        Opctmp3_rsb = (((Opctmp >> 12) & 0xF) << 0) | (((Opctmp >> 16) & 0xF) << 5) | (((Opctmp >> 25) & 0x1) << 24) | (((Opctmp >> 25) & 0x1) ? ((Opctmp & 0xFFF) << 10) : ((Opctmp & 0xF) << 16)) | (((Opctmp >> 20) & 1) << 29);
+        Opctmp3_rsb = (((Opctmp >> 12) & 0xF) << 0) | (((Opctmp >> 16) & 0xF) << 5) | 0 | ((18) << 16) | (((Opctmp >> 20) & 1) << 29);
         Condtmp = 0x0e;
         if (Addr & 1) {
             Opctmp = *(UINT16*)(Addrtmp);
@@ -167,6 +173,20 @@ condition0:
             case 2:
                 Opctmp2 = 0x4b000000 | Opctmp3;
                 break;
+            case 3:
+                Opctmp4 = 0;
+                if (((Opctmp >> 25) & 0x1) == 0) {
+                    *(UINT32*)(JITTMP + 4) = 0xD2800012 | ((Opctmp4 >> (16 * 0)) & 0xFFFF) << 5;
+                    *(UINT32*)(JITTMP + 8) = 0xF2A00012 | ((Opctmp4 >> (16 * 1)) & 0xFFFF) << 5;
+                    *(UINT32*)(JITTMP + 12) = 0xD503201F;
+                }
+                else {
+                    *(UINT32*)(JITTMP + 4) = 0xD503201F;
+                    *(UINT32*)(JITTMP + 8) = 0xD503201F;
+                    *(UINT32*)(JITTMP + 12) = (0x2A0003F2 | (((Opctmp & 0xF) << 16)));
+                }
+                Opctmp2 = 0x4b000000 | Opctmp3_rsb;
+                break;
             case 4:
                 Opctmp2 = 0x0b000000 | Opctmp3;
                 break;
@@ -175,6 +195,20 @@ condition0:
                 break;
             case 6:
                 Opctmp2 = 0x5a000000 | Opctmp3;
+                break;
+            case 7:
+                Opctmp4 = 0;
+                if (((Opctmp >> 25) & 0x1) == 0) {
+                    *(UINT32*)(JITTMP + 4) = 0xD2800012 | ((Opctmp4 >> (16 * 0)) & 0xFFFF) << 5;
+                    *(UINT32*)(JITTMP + 8) = 0xF2A00012 | ((Opctmp4 >> (16 * 1)) & 0xFFFF) << 5;
+                    *(UINT32*)(JITTMP + 12) = 0xD503201F;
+                }
+                else {
+                    *(UINT32*)(JITTMP + 4) = 0xD503201F;
+                    *(UINT32*)(JITTMP + 8) = 0xD503201F;
+                    *(UINT32*)(JITTMP + 12) = (0x2A0003F2 | (((Opctmp & 0xF) << 16)));
+                }
+                Opctmp2 = 0x5a000000 | Opctmp3_rsb;
                 break;
             case 8:
                 Opctmp2 = 0x6a00001f | Opctmp3;
@@ -202,6 +236,7 @@ condition0:
                 break;
             }
         }
+        *(UINT32*)(JITTMP + 36) = Opctmp2;
         if (Condtmp == 0x0e) { 
             *(UINT32*)(JITTMP + 24) = 0xD503201F; *(UINT32*)(JITTMP + 28) = 0xD503201F;
         }
